@@ -7,5 +7,6 @@ import store.ACS.entity.User;
 
 @Repository
 public interface UserRepo extends JpaRepository<User ,Long> {
-	
+	boolean existsByUsername(String username);
+	boolean existsByEmail(String email);
 }
