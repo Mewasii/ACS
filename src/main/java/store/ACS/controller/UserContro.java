@@ -8,9 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import store.ACS.dto.ApiResponse;
-import store.ACS.dto.UserCreRequest;
-import store.ACS.dto.UserUpdRequest;
+import store.ACS.dto.request.UserCreRequest;
+import store.ACS.dto.request.UserUpdRequest;
+import store.ACS.dto.response.ApiResponse;
+import store.ACS.dto.response.UserResponse;
 import store.ACS.entity.User;
 import store.ACS.service.IUserServi;
 
@@ -38,14 +39,18 @@ public class UserContro {
 
 	// Lấy user theo Id
 	@GetMapping("/{userId}")
-	User getUser(@PathVariable Long userId) {
+	UserResponse getUser(@PathVariable Long userId) {
 		return iUserServi.getUserById(userId);
 	}
 
 	// Thay đổi user theo Id
 	@PutMapping("/{userId}")
-	User updateUser(@PathVariable Long userId, @RequestBody UserUpdRequest request) {
-		return iUserServi.updateUserById(userId, request);
+	public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long userId, @RequestBody UserUpdRequest request) {
+		UserResponse updateUser = iUserServi.updateUserById(userId, request);
+		ApiResponse<UserResponse> response = new ApiResponse<>(true, "Create Successfully",updateUser,
+				HttpStatus.CREATED.value() // Trả về status
+				);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	// Xóa User theo Id

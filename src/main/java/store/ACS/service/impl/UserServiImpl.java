@@ -1,13 +1,16 @@
 package store.ACS.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import store.ACS.dto.UserCreRequest;
-import store.ACS.dto.UserUpdRequest;
+import store.ACS.dto.request.UserCreRequest;
+import store.ACS.dto.request.UserUpdRequest;
+import store.ACS.dto.response.UserResponse;
 import store.ACS.entity.User;
+import store.ACS.mapper.UserMapper;
 import store.ACS.respository.UserRepo;
 import store.ACS.service.IUserServi;
 
@@ -15,6 +18,8 @@ import store.ACS.service.IUserServi;
 public class UserServiImpl implements IUserServi {
 	@Autowired
 	private UserRepo userRepo;
+	@Autowired
+	private UserMapper userMapper;
 
 	// Create user
 	public User createRequest(UserCreRequest request) {
@@ -25,15 +30,9 @@ public class UserServiImpl implements IUserServi {
 		if (userRepo.existsByEmail(request.getEmail())) {
 			throw new RuntimeException("Email existed");
 		} else {
-			User user = new User();
-			user.setUsername(request.getUsername());
-			user.setPassword(request.getPassword());
-			user.setFullname(request.getFullname());
-			user.setEmail(request.getEmail());
-			user.setPhone(request.getPhone());
-			user.setRole(request.getRole());
-			user.setActive(request.getActive());
-			return userRepo.save(user);
+			User user = userMapper.toUser(request);
+			return  userRepo.save(user);
+
 		}
 	}
 
@@ -44,21 +43,16 @@ public class UserServiImpl implements IUserServi {
 
 	// gọi user theo id
 	@Override
-	public User getUserById(Long Id) {
-		return userRepo.findById(Id).orElseThrow(() -> new RuntimeException("User not found"));
+	public UserResponse getUserById(Long Id) {
+		return userMapper.toUserResponse( userRepo.findById(Id).orElseThrow(() -> new RuntimeException("User not found")));
 	}
 
 	// update user theo id
 	@Override
-	public User updateUserById(Long userId, UserUpdRequest request) {
-		User user = getUserById(userId);
-		user.setPassword(request.getPassword());
-		user.setFullname(request.getFullname());
-		user.setEmail(request.getEmail());
-		user.setPhone(request.getPhone());
-		user.setRole(request.getRole());
-		user.setActive(request.getActive());
-		return userRepo.save(user);
+	public UserResponse updateUserById(Long userId, UserUpdRequest request) {
+	    User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+		userMapper.updateUser(user,request);
+		return userMapper.toUserResponse( userRepo.save(user));
 	}
 
 	// delete user theo id
