@@ -45,11 +45,12 @@ public class UserContro {
 
 	// Thay đổi user theo Id
 	@PutMapping("/{userId}")
-	public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long userId, @RequestBody UserUpdRequest request) {
+	public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long userId,
+			@RequestBody UserUpdRequest request) {
 		UserResponse updateUser = iUserServi.updateUserById(userId, request);
-		ApiResponse<UserResponse> response = new ApiResponse<>(true, "Create Successfully",updateUser,
+		ApiResponse<UserResponse> response = new ApiResponse<>(true, "Create Successfully", updateUser,
 				HttpStatus.CREATED.value() // Trả về status
-				);
+		);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 

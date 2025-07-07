@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import store.ACS.dto.request.UserCreRequest;
@@ -31,6 +33,8 @@ public class UserServiImpl implements IUserServi {
 			throw new RuntimeException("Email existed");
 		} else {
 			User user = userMapper.toUser(request);
+			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4) ; //param strenght được truyền vào 
+			user.setPassword(passwordEncoder.encode(request.getPassword()));
 			return  userRepo.save(user);
 
 		}
@@ -59,4 +63,5 @@ public class UserServiImpl implements IUserServi {
 	public void deleteUserById(Long userId) {
 		userRepo.deleteById(userId);
 	}
+	
 }
