@@ -1,5 +1,6 @@
 package store.ACS.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,47 +17,89 @@ import store.ACS.entity.User;
 import store.ACS.service.IUserServi;
 
 @RestController
+@RequestMapping("/users")
 public class UserContro {
 
 	@Autowired
 	private IUserServi iUserServi;
 
 	// Tạo mới user
-	@PostMapping("/users") // thêm Validate và trả về apiResponse
+	@PostMapping
 	public ResponseEntity<ApiResponse<User>> createUser(@RequestBody @Valid UserCreRequest request) {
 		User createdUser = iUserServi.createRequest(request);
-		ApiResponse<User> response = new ApiResponse<>(true, "Create Successfully", createdUser,
-				HttpStatus.CREATED.value() // Trả về status
-		);
+
+		ApiResponse<User> response = ApiResponse.<User>builder()
+				.success(true)
+				.message("Create Successfully")
+				.result(createdUser)
+				.status(HttpStatus.CREATED.value())
+				.timestamp(LocalDateTime.now())
+				.build();
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	// Lấy toàn bộ user
-	@GetMapping("/users")
-	List<User> getUsers() {
-		return iUserServi.getUser();
+	@GetMapping
+	public ResponseEntity<ApiResponse<List<User>>> getUsers() {
+		List<User> users = iUserServi.getUser();
+
+		ApiResponse<List<User>> response = ApiResponse.<List<User>>builder()
+				.success(true)
+				.message("List of users")
+				.result(users)
+				.status(HttpStatus.OK.value())
+				.timestamp(LocalDateTime.now())
+				.build();
+
+		return ResponseEntity.ok(response);
 	}
 
 	// Lấy user theo Id
 	@GetMapping("/{userId}")
-	UserResponse getUser(@PathVariable Long userId) {
-		return iUserServi.getUserById(userId);
+	public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long userId) {
+		UserResponse user = iUserServi.getUserById(userId);
+
+		ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
+				.success(true)
+				.message("User found")
+				.result(user)
+				.status(HttpStatus.OK.value())
+				.timestamp(LocalDateTime.now())
+				.build();
+
+		return ResponseEntity.ok(response);
 	}
 
-	// Thay đổi user theo Id
+	// Cập nhật user theo Id
 	@PutMapping("/{userId}")
 	public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long userId,
-			@RequestBody UserUpdRequest request) {
-		UserResponse updateUser = iUserServi.updateUserById(userId, request);
-		ApiResponse<UserResponse> response = new ApiResponse<>(true, "Create Successfully", updateUser,
-				HttpStatus.CREATED.value() // Trả về status
-		);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+			@RequestBody @Valid UserUpdRequest request) {
+		UserResponse updatedUser = iUserServi.updateUserById(userId, request);
+
+		ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
+				.success(true)
+				.message("Update Successfully")
+				.result(updatedUser)
+				.status(HttpStatus.OK.value())
+				.timestamp(LocalDateTime.now())
+				.build();
+
+		return ResponseEntity.ok(response);
 	}
 
-	// Xóa User theo Id
+	// Xóa user theo Id
 	@DeleteMapping("/{userId}")
-	public void deleteUser(@PathVariable Long userId) {
+	public ResponseEntity<ApiResponse<Object>> deleteUser(@PathVariable Long userId) {
 		iUserServi.deleteUserById(userId);
+
+		ApiResponse<Object> response = ApiResponse.builder()
+				.success(true)
+				.message("Deleted successfully")
+				.status(HttpStatus.NO_CONTENT.value())
+				.timestamp(LocalDateTime.now())
+				.build();
+
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
 	}
 }

@@ -5,11 +5,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.nimbusds.jose.JOSEException;
+
 import jakarta.validation.Valid;
 import store.ACS.dto.request.AuthenticationRequest;
+import store.ACS.dto.request.IntrospectRequest;
 import store.ACS.dto.response.AuthenticationResponse;
+import store.ACS.dto.response.IntrospectResponse;
 import store.ACS.dto.response.ApiResponse;
 import store.ACS.service.IAuthenticationServi;
+
+import java.text.ParseException;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
@@ -18,19 +25,34 @@ public class AuthenticationController {
 
 	private final IAuthenticationServi iAuthenticationServi;
 
-	@PostMapping("/login")
+	@PostMapping("/log-in")
 	public ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(
-			@RequestBody AuthenticationRequest request) {
+			@Valid @RequestBody AuthenticationRequest request) {
+		AuthenticationResponse authResponse = iAuthenticationServi.authenticate(request);
+		boolean isAuthenticated = authResponse.isAuthenticated();
+		HttpStatus status = isAuthenticated ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+		String message = isAuthenticated ? "Login successful" : "Invalid username or password";
 
-		boolean isAuthenticated = iAuthenticationServi.authenticate(request);
+		ApiResponse<AuthenticationResponse> response = ApiResponse.<AuthenticationResponse>builder()
+				.success(isAuthenticated).message(message).result(authResponse).status(status.value())
+				.timestamp(LocalDateTime.now()).build();
 
-		AuthenticationResponse authResponse = AuthenticationResponse.builder().Authenticated(isAuthenticated).build();
-
-		String message = isAuthenticated ? "Login successfully" : "Invalid credentials";
-
-		ApiResponse<AuthenticationResponse> response = new ApiResponse<>(isAuthenticated, message, authResponse,
-				isAuthenticated ? HttpStatus.OK.value() : HttpStatus.UNAUTHORIZED.value());
-
-		return ResponseEntity.status(isAuthenticated ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(response);
+		return ResponseEntity.status(status).body(response);
 	}
+
+	@PostMapping("/introspect")
+	public ResponseEntity<ApiResponse<IntrospectResponse>> introspect(@RequestBody IntrospectRequest request)
+			throws ParseException, JOSEException {
+		IntrospectResponse result = iAuthenticationServi.introspect(request);
+
+		boolean isValid = result.isValid();
+		HttpStatus status = isValid ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+
+		ApiResponse<IntrospectResponse> response = ApiResponse.<IntrospectResponse>builder().success(isValid)
+				.message(isValid ? "Token is valid" : "Token is invalid or expired").status(status.value())
+				.timestamp(LocalDateTime.now()).result(result).build();
+
+		return ResponseEntity.status(status).body(response);
+	}
+
 }

@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "success", "message", "timestamp", "status", "result" }) // Sắp xếp thứ tự JSON trả về
@@ -18,16 +19,4 @@ public class ApiResponse<T> {
 	T result;
 	LocalDateTime timestamp;
 	int status;
-
-	public ApiResponse() {
-		this.timestamp = LocalDateTime.now();
-	}
-
-	public ApiResponse(Boolean success, String message, T result, int status) {
-		this.success = success;
-		this.message = message;
-		this.timestamp = LocalDateTime.now();
-		this.status = status;
-		this.result = result;
-	}
 }
