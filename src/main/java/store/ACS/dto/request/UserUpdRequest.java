@@ -1,5 +1,7 @@
 package store.ACS.dto.request;
 
+import java.util.Set;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +20,6 @@ public class UserUpdRequest {
 	String fullname;
 	String email;
 	String phone;
-	String role;
+	Set<String> roles;
 	Boolean active;
 }

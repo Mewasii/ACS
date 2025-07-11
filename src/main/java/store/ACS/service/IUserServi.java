@@ -1,6 +1,7 @@
 package store.ACS.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -14,8 +15,8 @@ public interface IUserServi {
 
 	User createRequest(UserCreRequest request);
     List<User> getUser();
-    UserResponse getUserById(Long userId);
-    UserResponse updateUserById(Long userId, UserUpdRequest request);
-    void deleteUserById(Long userId);
+    UserResponse getUserById(UUID userId);
+    UserResponse updateUserById(UUID userId, UserUpdRequest request);
+    void deleteUserById(UUID userId);
 	
 }

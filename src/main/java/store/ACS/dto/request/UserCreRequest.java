@@ -1,5 +1,7 @@
 package store.ACS.dto.request;
 
+import java.util.Set;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -38,7 +40,7 @@ public class UserCreRequest {
 	@NotBlank(message = "Phone is required")
 	@Pattern(regexp = "^(\\+\\d{1,3}[- ]?)?\\d{9,11}$", message = "Invalid phone number format")
 	String phone;
-	String role;
+	Set<String> roles;
 	Boolean active;
 
 }

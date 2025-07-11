@@ -2,6 +2,7 @@ package store.ACS.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,7 +58,7 @@ public class UserContro {
 
 	// Lấy user theo Id
 	@GetMapping("/{userId}")
-	public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long userId) {
+	public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable UUID userId) {
 		UserResponse user = iUserServi.getUserById(userId);
 
 		ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
@@ -73,7 +74,7 @@ public class UserContro {
 
 	// Cập nhật user theo Id
 	@PutMapping("/{userId}")
-	public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long userId,
+	public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable UUID userId,
 			@RequestBody @Valid UserUpdRequest request) {
 		UserResponse updatedUser = iUserServi.updateUserById(userId, request);
 
@@ -90,7 +91,7 @@ public class UserContro {
 
 	// Xóa user theo Id
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<ApiResponse<Object>> deleteUser(@PathVariable Long userId) {
+	public ResponseEntity<ApiResponse<Object>> deleteUser(@PathVariable UUID userId) {
 		iUserServi.deleteUserById(userId);
 
 		ApiResponse<Object> response = ApiResponse.builder()

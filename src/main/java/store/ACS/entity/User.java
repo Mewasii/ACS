@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import java.io.Serializable;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -20,9 +22,9 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "userid")
-	Long userid;
+	UUID userid;
 
 	@Column(name = "username", nullable = false, unique = true, columnDefinition = "nvarchar(100)")
 	String username;
@@ -39,8 +41,8 @@ public class User implements Serializable {
 	@Column(name = "phone", columnDefinition = "nvarchar(20)")
 	String phone;
 
-	@Column(name = "role", columnDefinition = "nvarchar(50)")
-	String role;
+	@Column(name = "role")
+	Set<String> roles;
 
 	@Column(name = "active", columnDefinition = "BOOLEAN DEFAULT TRUE")
 	Boolean active;
