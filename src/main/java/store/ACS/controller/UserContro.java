@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -44,7 +45,6 @@ public class UserContro {
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<User>>> getUsers() {
 		List<User> users = iUserServi.getUser();
-
 		ApiResponse<List<User>> response = ApiResponse.<List<User>>builder()
 				.success(true)
 				.message("List of users")

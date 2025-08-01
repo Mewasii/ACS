@@ -1,4 +1,5 @@
 package store.ACS.respository;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,5 @@ import store.ACS.entity.User;
 public interface UserRepo extends JpaRepository<User ,UUID> {
 	boolean existsByUsername(String username);
 	boolean existsByEmail(String email);
-	User findByUsername(String username);
+	Optional<User> findByUsername(String username);
 }

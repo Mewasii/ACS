@@ -25,6 +25,8 @@ public class UserServiImpl implements IUserServi {
 	private UserRepo userRepo;
 	@Autowired
 	private UserMapper userMapper;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	// Create user
 	public User createRequest(UserCreRequest request) {

@@ -1,6 +1,7 @@
 package store.ACS.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -16,6 +17,7 @@ import store.ACS.dto.request.AuthenticationRequest;
 import store.ACS.dto.request.IntrospectRequest;
 import store.ACS.dto.response.AuthenticationResponse;
 import store.ACS.dto.response.IntrospectResponse;
+import store.ACS.entity.User;
 import store.ACS.respository.UserRepo;
 import store.ACS.service.IAuthenticationServi;
 
@@ -23,6 +25,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,24 +43,26 @@ public class AuthenticationServiImpl implements IAuthenticationServi {
 	 
 	 //Kiểm tra login, hợp lệ trả về cho client token
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
-		var user = userRepo.findByUsername(request.getUsername());
+		var user = userRepo.findByUsername(request.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 		boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 		if (!authenticated) {
 			return AuthenticationResponse.builder().Authenticated(false).token(null).build();
 		} else {
-			var token = generateToken(request.getUsername());
+			var token = generateToken(user);
 			return AuthenticationResponse.builder().token(token).Authenticated(true).build();
 		}
 	}
     //Hàm tạo Token 
-	private String generateToken(String username) {
+	private String generateToken(User user) {
 // JSON WEB SIGNATURE HEADER
 		JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
 // BODY
-		JWTClaimsSet jwtClamsSet = new JWTClaimsSet.Builder().subject(username).issuer("AnimalConShop.com")
+		JWTClaimsSet jwtClamsSet = new JWTClaimsSet.Builder().subject(user.getUsername()).issuer("AnimalConShop.com")
 				.issueTime(new Date()).expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+				//thêm vào claim table giá trị scope = roles
+				.claim("scope",buildScope(user))
 				.build();
 
 		Payload payload = new Payload(jwtClamsSet.toJSONObject());
@@ -89,5 +94,13 @@ public class AuthenticationServiImpl implements IAuthenticationServi {
 		boolean isValid = verified && expiryTime.after(new Date());
 
 		return IntrospectResponse.builder().valid(isValid).build();
+	}
+	//hàm thêm role vào jwt
+	private String buildScope(User user) {
+	    StringJoiner stringJoiner = new StringJoiner(" ");
+	    if (!CollectionUtils.isEmpty(user.getRoles())) { // Check if roles are NOT empty
+	        user.getRoles().forEach(stringJoiner::add);
+	    }
+	    return stringJoiner.toString();
 	}
 }
