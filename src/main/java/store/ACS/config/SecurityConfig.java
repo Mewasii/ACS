@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,7 +24,7 @@ import store.ACS.enums.Role;
 
 @Configuration
 @EnableWebSecurity
-
+@EnableMethodSecurity
 public class SecurityConfig {
 	 @Value("${jwt.signerkey}")
 	 private String signerkey;
@@ -33,7 +34,8 @@ public class SecurityConfig {
 		//Permit các endpoint public
 		httpSercurity.authorizeHttpRequests(request -> 
 		request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-		       .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
+//Enable nếu muốn phân quyền trên endpoint 
+//		.requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
 		       .anyRequest().authenticated());
 		//Disable csrf của xss	
 		httpSercurity.csrf(AbstractHttpConfigurer::disable);

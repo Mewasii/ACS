@@ -18,5 +18,6 @@ public interface IUserServi {
     UserResponse getUserById(UUID userId);
     UserResponse updateUserById(UUID userId, UserUpdRequest request);
     void deleteUserById(UUID userId);
+	UserResponse getMyInfo();
 	
 }

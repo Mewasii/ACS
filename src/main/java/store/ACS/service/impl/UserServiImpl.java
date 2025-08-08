@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,7 @@ public class UserServiImpl implements IUserServi {
 	}
 
 	// gọi all users
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<User> getUser() {
 		return userRepo.findAll();
 	}
@@ -73,5 +76,12 @@ public class UserServiImpl implements IUserServi {
 	public void deleteUserById(UUID userId) {
 		userRepo.deleteById(userId);
 	}
+	//ContextHolder
+	public UserResponse getMyInfo() {
+		var context = SecurityContextHolder.getContext();
+		String name = context.getAuthentication().getName();
+		User user = userRepo.findByUsername(name).orElseThrow(() -> new RuntimeException("User not found"));
+		return userMapper.toUserResponse(user);
+		}
 	
 }

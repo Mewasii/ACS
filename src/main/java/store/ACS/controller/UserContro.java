@@ -30,13 +30,8 @@ public class UserContro {
 	public ResponseEntity<ApiResponse<User>> createUser(@RequestBody @Valid UserCreRequest request) {
 		User createdUser = iUserServi.createRequest(request);
 
-		ApiResponse<User> response = ApiResponse.<User>builder()
-				.success(true)
-				.message("Create Successfully")
-				.result(createdUser)
-				.status(HttpStatus.CREATED.value())
-				.timestamp(LocalDateTime.now())
-				.build();
+		ApiResponse<User> response = ApiResponse.<User>builder().success(true).message("Create Successfully")
+				.result(createdUser).status(HttpStatus.CREATED.value()).timestamp(LocalDateTime.now()).build();
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
@@ -45,13 +40,8 @@ public class UserContro {
 	@GetMapping
 	public ResponseEntity<ApiResponse<List<User>>> getUsers() {
 		List<User> users = iUserServi.getUser();
-		ApiResponse<List<User>> response = ApiResponse.<List<User>>builder()
-				.success(true)
-				.message("List of users")
-				.result(users)
-				.status(HttpStatus.OK.value())
-				.timestamp(LocalDateTime.now())
-				.build();
+		ApiResponse<List<User>> response = ApiResponse.<List<User>>builder().success(true).message("List of users")
+				.result(users).status(HttpStatus.OK.value()).timestamp(LocalDateTime.now()).build();
 
 		return ResponseEntity.ok(response);
 	}
@@ -61,13 +51,18 @@ public class UserContro {
 	public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable UUID userId) {
 		UserResponse user = iUserServi.getUserById(userId);
 
-		ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
-				.success(true)
-				.message("User found")
-				.result(user)
-				.status(HttpStatus.OK.value())
-				.timestamp(LocalDateTime.now())
-				.build();
+		ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder().success(true).message("User found")
+				.result(user).status(HttpStatus.OK.value()).timestamp(LocalDateTime.now()).build();
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/myInfo")
+	public ResponseEntity<ApiResponse<UserResponse>> getMyInfo() {
+		UserResponse user = iUserServi.getMyInfo();
+
+		ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder().success(true).message("User found")
+				.result(user).status(HttpStatus.OK.value()).timestamp(LocalDateTime.now()).build();
 
 		return ResponseEntity.ok(response);
 	}
@@ -78,13 +73,9 @@ public class UserContro {
 			@RequestBody @Valid UserUpdRequest request) {
 		UserResponse updatedUser = iUserServi.updateUserById(userId, request);
 
-		ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder()
-				.success(true)
-				.message("Update Successfully")
-				.result(updatedUser)
-				.status(HttpStatus.OK.value())
-				.timestamp(LocalDateTime.now())
-				.build();
+		ApiResponse<UserResponse> response = ApiResponse.<UserResponse>builder().success(true)
+				.message("Update Successfully").result(updatedUser).status(HttpStatus.OK.value())
+				.timestamp(LocalDateTime.now()).build();
 
 		return ResponseEntity.ok(response);
 	}
@@ -94,12 +85,8 @@ public class UserContro {
 	public ResponseEntity<ApiResponse<Object>> deleteUser(@PathVariable UUID userId) {
 		iUserServi.deleteUserById(userId);
 
-		ApiResponse<Object> response = ApiResponse.builder()
-				.success(true)
-				.message("Deleted successfully")
-				.status(HttpStatus.NO_CONTENT.value())
-				.timestamp(LocalDateTime.now())
-				.build();
+		ApiResponse<Object> response = ApiResponse.builder().success(true).message("Deleted successfully")
+				.status(HttpStatus.NO_CONTENT.value()).timestamp(LocalDateTime.now()).build();
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
 	}
