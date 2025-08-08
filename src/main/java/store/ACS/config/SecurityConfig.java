@@ -41,7 +41,10 @@ public class SecurityConfig {
 		httpSercurity.csrf(AbstractHttpConfigurer::disable);
 		//Decode token
 		httpSercurity.oauth2ResourceServer(oauth2 -> 
-		oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())));
+		oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))
+//Thêm vào authenticationEntryPoint để custom message error cho tầng filter
+		.authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+		);
 		
 		return httpSercurity.build();
 	}

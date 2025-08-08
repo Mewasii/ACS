@@ -1,69 +1,90 @@
 package store.ACS.exception;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
-
 import store.ACS.dto.response.ApiResponse;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ NoHandlerFoundException.class, NoResourceFoundException.class })
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
     public ResponseEntity<ApiResponse<Object>> handleNotFound(Exception ex) {
-        ApiResponse<Object> response = ApiResponse.builder()
-                .success(false)
-                .message("Not Found: " + ex.getMessage())
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Object>> handleRuntime(RuntimeException ex) {
-        ApiResponse<Object> response = ApiResponse.builder()
-                .success(false)
-                .message("Runtime Error: " + ex.getMessage())
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .build();
-
-        return ResponseEntity.badRequest().body(response);
+        return buildResponse(ErrorCode.USER_NOT_EXISTED, null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidationException(MethodArgumentNotValidException ex) {
         FieldError fieldError = ex.getBindingResult().getFieldError();
-        String message = "Validation Error: " + (fieldError != null ? fieldError.getDefaultMessage() : "Invalid input");
+        ErrorCode errorCode = determineErrorCode(fieldError, ex.getMessage());
+        String message = Optional.ofNullable(fieldError)
+                .map(error -> errorCode.getMessage() + ": " + error.getDefaultMessage())
+                .orElse(errorCode.getMessage());
+        return buildResponse(errorCode, message);
+    }
 
-        ApiResponse<Object> response = ApiResponse.builder()
-                .success(false)
-                .message(message)
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .build();
-
-        return ResponseEntity.badRequest().body(response);
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRuntime(RuntimeException ex) {
+        ErrorCode errorCode = determineErrorCode(null, ex.getMessage());
+        String message = Optional.ofNullable(ex.getMessage())
+                .map(msg -> errorCode.getMessage() + ": " + msg)
+                .orElse(errorCode.getMessage());
+        return buildResponse(errorCode, message);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneric(Exception ex) {
+        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
+        String message = Optional.ofNullable(ex.getMessage())
+                .map(msg -> errorCode.getMessage() + ": " + msg)
+                .orElse(errorCode.getMessage());
+        return buildResponse(errorCode, message);
+    }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDeniedException(Exception ex) {
+        ErrorCode errorCode = ErrorCode.ACCCESSDENIED;
+        String message = Optional.ofNullable(ex.getMessage())
+                .map(msg -> errorCode.getMessage() + ": " + msg)
+                .orElse(errorCode.getMessage());
+        return buildResponse(errorCode, message);
+    }
+
+    private ResponseEntity<ApiResponse<Object>> buildResponse(ErrorCode errorCode, String customMessage) {
         ApiResponse<Object> response = ApiResponse.builder()
                 .success(false)
-                .message("Internal Server Error: " + ex.getMessage())
+                .code(errorCode.getCode())
+                .message(customMessage != null ? customMessage : errorCode.getMessage())
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .status(errorCode.getStatusCode().value())
                 .build();
+        return ResponseEntity.status(errorCode.getStatusCode()).body(response);
+    }
+    
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    private ErrorCode determineErrorCode(FieldError fieldError, String message) {
+        if (fieldError != null) {
+            String field = fieldError.getField();
+            String errorMessage = fieldError.getDefaultMessage();
+            if ("username".equals(field) && errorMessage != null && errorMessage.contains("3 characters")) {
+                return ErrorCode.USERNAME_INVALID;
+            } else if ("password".equals(field) && errorMessage != null && errorMessage.contains("8 characters")) {
+                return ErrorCode.INVALID_PASSWORD;
+            }
+            return ErrorCode.INVALID_KEY;
+        }
+        if (message != null) {
+            if (message.contains("User existed")) return ErrorCode.USER_EXISTED;
+            if (message.contains("Unauthenticated")) return ErrorCode.UNAUTHENTICATED;
+            if (message.contains("User not existed")) return ErrorCode.USER_NOT_EXISTED;
+        }
+        return ErrorCode.UNCATEGORIZED_EXCEPTION;
     }
 }

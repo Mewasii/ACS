@@ -12,9 +12,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "success", "message", "timestamp", "status", "result" }) // Sắp xếp thứ tự JSON trả về
+@JsonPropertyOrder({ "success","code","message", "timestamp", "status", "result" }) // Sắp xếp thứ tự JSON trả về
 public class ApiResponse<T> {
 	Boolean success;
+	int code;
 	String message;
 	T result;
 	LocalDateTime timestamp;
