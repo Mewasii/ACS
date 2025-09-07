@@ -65,7 +65,7 @@ public class SecurityConfig {
 	@Bean
 	 JwtAuthenticationConverter jwtAuthenticationConverter() {
 	    JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-	    jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_"); // thêm prefix nếu dùng @PreAuthorize("hasRole(...)")
+	    jwtGrantedAuthoritiesConverter.setAuthorityPrefix(""); // thêm prefix nếu dùng @PreAuthorize("hasRole(...)")
 	    JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 	    jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     return jwtAuthenticationConverter;
