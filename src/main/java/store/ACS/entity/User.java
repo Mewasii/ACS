@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,8 +42,8 @@ public class User implements Serializable {
 	@Column(name = "phone", columnDefinition = "nvarchar(20)")
 	String phone;
 
-	@Column(name = "role")
-	Set<String> roles;
+	@ManyToMany
+	Set<Role> roles;
 
 	@Column(name = "active", columnDefinition = "BOOLEAN DEFAULT TRUE")
 	Boolean active;

@@ -13,7 +13,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,26 +20,27 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreRequest {
 
-	@NotBlank(message = "Username is required")
-	@Size(min = 4, max = 30, message = "Username must be between 4 and 30 characters")
-	String username;
+    @NotBlank(message = "Username is required")
+    @Size(min = 4, max = 30, message = "Username must be between 4 and 30 characters")
+    String username;
 
-	@NotBlank(message = "Password is required")
-	@Size(min = 8, message = "Password must be at least 8 characters")
-	String password;
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    String password;
 
-	@NotBlank(message = "Fullname is required")
-	@Size(max = 50, message = "Fullname must be at most 50 characters")
-	String fullname;
+    @NotBlank(message = "Fullname is required")
+    @Size(max = 50, message = "Fullname must be at most 50 characters")
+    String fullname;
 
-	@NotBlank(message = "Email is required")
-	@Email(message = "Invalid email format")
-	String email;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    String email;
 
-	@NotBlank(message = "Phone is required")
-	@Pattern(regexp = "^(\\+\\d{1,3}[- ]?)?\\d{9,11}$", message = "Invalid phone number format")
-	String phone;
-	Set<String> roles;
-	Boolean active;
+    @NotBlank(message = "Phone is required")
+    @Pattern(regexp = "^(\\+\\d{1,3}[- ]?)?\\d{9,11}$", message = "Invalid phone number format")
+    String phone;
 
+    Set<String> roles; // Changed from Set<UserCreRequest> to Set<String>
+
+    Boolean active;
 }

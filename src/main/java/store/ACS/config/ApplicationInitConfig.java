@@ -29,7 +29,9 @@ public class ApplicationInitConfig {
 			if (userRepo.findByUsername("admin").isEmpty()) {
 				var roles = new HashSet<String>();
 				roles.add(Role.ADMIN.name());
-				User user = User.builder().username("admin").roles(roles).password(passwordEncoder.encode("admin"))
+				User user = User.builder().username("admin")
+						//.roles(roles)
+						.password(passwordEncoder.encode("admin"))
 						.build();
 				userRepo.save(user);
 				log.warn("admin have been created with default password");

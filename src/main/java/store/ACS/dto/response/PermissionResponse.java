@@ -1,9 +1,5 @@
-package store.ACS.dto.request;
+package store.ACS.dto.response;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.management.relation.Role;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,16 +8,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserUpdRequest {
-	String password;
-	String fullname;
-	String email;
-	String phone;
-	List<String> roles;
-	Boolean active;
+public class PermissionResponse {
+	String name;
+	String description;
 }

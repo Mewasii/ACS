@@ -11,5 +11,6 @@ import store.ACS.entity.User;
 public interface UserRepo extends JpaRepository<User ,UUID> {
 	boolean existsByUsername(String username);
 	boolean existsByEmail(String email);
+	boolean existsByPhone(String phone);
 	Optional<User> findByUsername(String username);
 }
