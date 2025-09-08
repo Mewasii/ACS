@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import store.ACS.validator.PhoneConstraint;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +40,7 @@ public class User implements Serializable {
 
 	@Column(name = "email", unique = true, columnDefinition = "nvarchar(100)")
 	String email;
-
+	
 	@Column(name = "phone", columnDefinition = "nvarchar(20)")
 	String phone;
 

@@ -75,8 +75,12 @@ public class GlobalExceptionHandler {
             String errorMessage = fieldError.getDefaultMessage();
             if ("username".equals(field) && errorMessage != null && errorMessage.contains("3 characters")) {
                 return ErrorCode.USERNAME_INVALID;
-            } else if ("password".equals(field) && errorMessage != null && errorMessage.contains("8 characters")) {
+            }
+            if ("password".equals(field) && errorMessage != null && errorMessage.contains("8 characters")) {
                 return ErrorCode.INVALID_PASSWORD;
+            }
+            if ("phone".equals(field) && errorMessage != null && errorMessage.contains("10 characters")) {
+                return ErrorCode.INVALID_PHONE;
             }
             return ErrorCode.INVALID_KEY;
         }
@@ -84,6 +88,7 @@ public class GlobalExceptionHandler {
             if (message.contains("User existed")) return ErrorCode.USER_EXISTED;
             if (message.contains("Unauthenticated")) return ErrorCode.UNAUTHENTICATED;
             if (message.contains("User not existed")) return ErrorCode.USER_NOT_EXISTED;
+
         }
         return ErrorCode.UNCATEGORIZED_EXCEPTION;
     }
