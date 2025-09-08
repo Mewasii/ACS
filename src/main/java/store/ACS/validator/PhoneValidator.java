@@ -5,16 +5,19 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class PhoneValidator implements ConstraintValidator<PhoneConstraint, String> {
 
+    private int must;
+
     @Override
     public void initialize(PhoneConstraint constraintAnnotation) {
+        this.must = constraintAnnotation.must();
     }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return false; // hoặc true nếu cho phép null
+        if (value == null || value.isBlank()) {
+            return false; // để @NotBlank lo message "Phone is required"
         }
-        // Regex: chỉ cho phép đúng 10 số
-        return value.matches("^\\d{10}$");
+        // Regex: chỉ cho phép số và đúng chiều dài must
+        return value.matches("^\\d{" + must + "}$");
     }
 }

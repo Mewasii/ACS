@@ -39,7 +39,7 @@ public class UserCreRequest {
 
     @NotBlank(message = "Phone is required")
     //@Pattern(regexp = "^(\\+\\d{1,3}[- ]?)?\\d{9,11}$", message = "Invalid phone number format")
-    @PhoneConstraint(message = "Phone number must be at least 10 characters")
+    @PhoneConstraint(must = 10 ,message = "Phone error")
     String phone;
 
     Set<String> roles; // Changed from Set<UserCreRequest> to Set<String>
