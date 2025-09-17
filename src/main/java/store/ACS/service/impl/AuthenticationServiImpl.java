@@ -15,9 +15,14 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.experimental.NonFinal;
 import store.ACS.dto.request.AuthenticationRequest;
 import store.ACS.dto.request.IntrospectRequest;
+import store.ACS.dto.request.LogoutRequest;
 import store.ACS.dto.response.AuthenticationResponse;
 import store.ACS.dto.response.IntrospectResponse;
+import store.ACS.entity.InvalidatedToken;
 import store.ACS.entity.User;
+import store.ACS.exception.AppException;
+import store.ACS.exception.ErrorCode;
+import store.ACS.respository.InvalidTokenRepo;
 import store.ACS.respository.UserRepo;
 import store.ACS.service.IAuthenticationServi;
 
@@ -26,6 +31,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +42,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AuthenticationServiImpl implements IAuthenticationServi {
 	@Autowired
 	UserRepo userRepo;
+	@Autowired
+	InvalidTokenRepo invalidTokenRepo;
 	//Gọi key 
 	 @NonFinal
 	 @Value("${jwt.signerkey}")
@@ -61,6 +69,8 @@ public class AuthenticationServiImpl implements IAuthenticationServi {
 // BODY
 		JWTClaimsSet jwtClamsSet = new JWTClaimsSet.Builder().subject(user.getUsername()).issuer("AnimalConShop.com")
 				.issueTime(new Date()).expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+				// thêm id cho token
+				.jwtID(UUID.randomUUID().toString())
 				//thêm vào claim table giá trị scope = roles
 				.claim("scope",buildScope(user))
 				.build();
@@ -78,23 +88,18 @@ public class AuthenticationServiImpl implements IAuthenticationServi {
 	}
 
 	// Kiểm tra token ( dùng signature )
-	public IntrospectResponse introspect(IntrospectRequest request) throws ParseException {
-		var token = request.getToken();
-		SignedJWT signedJWT;
-		boolean verified;
-		try {
-			signedJWT = SignedJWT.parse(token);
-			MACVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
-			verified = signedJWT.verify(verifier);
-		} catch (Exception e) {
-			return IntrospectResponse.builder().valid(false).build(); // Token lỗi định dạng hoặc không xác minh được
-		}
+	 public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
+	        var token = request.getToken();
+	        boolean isValid = true;
 
-		Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-		boolean isValid = verified && expiryTime.after(new Date());
+	        try {
+	            verifytoken(token);
+	        } catch (Exception e ) {
+	            isValid = false;
+	        }
 
-		return IntrospectResponse.builder().valid(isValid).build();
-	}
+	        return IntrospectResponse.builder().valid(isValid).build();
+	    }
 	//hàm thêm role vào jwt
 	private String buildScope(User user) {
 	    StringJoiner stringJoiner = new StringJoiner(" ");
@@ -107,4 +112,45 @@ public class AuthenticationServiImpl implements IAuthenticationServi {
 	    }
 	    return stringJoiner.toString();
 	}
+	//giữ token khi logout
+	public void logout(LogoutRequest request)  throws ParseException,JOSEException {
+		var signedToken = verifytoken(request.getToken());
+		String jit = signedToken.getJWTClaimsSet().getJWTID();
+		Date expiryTime = signedToken.getJWTClaimsSet().getExpirationTime();
+		InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+				.id(jit)
+				.expiryTime(expiryTime)
+				.build();
+	 invalidTokenRepo.save(invalidatedToken);
+	}
+	
+	private SignedJWT verifytoken(String token) {
+	    try {
+	        SignedJWT signedJWT = SignedJWT.parse(token);
+	        MACVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+	        boolean verified = signedJWT.verify(verifier);
+
+	        Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+	        if (!verified) {
+	            throw new AppException(ErrorCode.TOKEN_INVALID);
+	        }
+	        if (expiryTime.before(new Date())) {
+	            throw new AppException(ErrorCode.TOKEN_EXPIRED);
+	        }
+	        if (invalidTokenRepo.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
+	            throw new AppException(ErrorCode.TOKEN_BLACKLISTED);
+	        }
+
+	        return signedJWT;
+
+	    } catch (AppException e) {
+	        // ném lại các lỗi custom để handler xử lý
+	        throw e;
+	    } catch (Exception e) {
+	        // fallback cho lỗi parse hoặc lỗi JOSE khác
+	        throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+	    }
+	}
+
 }

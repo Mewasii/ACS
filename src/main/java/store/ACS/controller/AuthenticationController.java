@@ -10,6 +10,7 @@ import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
 import store.ACS.dto.request.AuthenticationRequest;
 import store.ACS.dto.request.IntrospectRequest;
+import store.ACS.dto.request.LogoutRequest;
 import store.ACS.dto.response.AuthenticationResponse;
 import store.ACS.dto.response.IntrospectResponse;
 import store.ACS.dto.response.ApiResponse;
@@ -54,5 +55,11 @@ public class AuthenticationController {
 
 		return ResponseEntity.status(status).body(response);
 	}
-
+	
+	@PostMapping("/log-out")
+	ApiResponse<Void> lougout(@RequestBody LogoutRequest request)
+			throws ParseException, JOSEException {
+		 iAuthenticationServi.logout(request);
+			return ApiResponse.<Void>builder().build();
+	}
 }

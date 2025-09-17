@@ -95,6 +95,13 @@ public class GlobalExceptionHandler {
                 .orElse(errorCode.getMessage());
         return buildResponse(errorCode, message);
     }
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAppException(AppException ex) {
+        ErrorCode errorCode = ex.getErrorCode();
+        String message = errorCode.getMessage();
+
+        return buildResponse(errorCode, message);
+    }
     
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Object>> handleDeniedException(Exception ex) {

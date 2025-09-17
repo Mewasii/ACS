@@ -13,7 +13,11 @@ public enum ErrorCode {
     UNAUTHENTICATED(4403, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     ACCCESSDENIED(4404, "Access denied", HttpStatus.FORBIDDEN),
     INVALID_KEY(4405, "Invalid key", HttpStatus.BAD_REQUEST),
-    UNCATEGORIZED_EXCEPTION(4500, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR);
+    UNCATEGORIZED_EXCEPTION(4500, "Uncategorized exception", HttpStatus.INTERNAL_SERVER_ERROR),
+    TOKEN_INVALID(4406, "Token signature is invalid", HttpStatus.UNAUTHORIZED),
+    TOKEN_EXPIRED(4407, "Token has expired", HttpStatus.UNAUTHORIZED),
+    TOKEN_BLACKLISTED(4411, "Token has been logged out or blacklisted", HttpStatus.UNAUTHORIZED);
+	
 
     private final int code;
     private final String message;
