@@ -48,6 +48,29 @@ The project focuses on providing a clean, production-ready structure while meeti
 │   └───impl        # Service implementations
 └───validator       # Custom annotations & validators
 ```
-# User Design
+# Overal Design
+## 1/ Database
 <img width="1044" height="671" alt="image" src="https://github.com/user-attachments/assets/8284a45e-b5d3-4e52-9878-79c9d7e0b350" />
+
+## 2/ Mapper layer
+The Mapper layer (using MapStruct) plays a key role in converting data between the API layer (DTOs) and the domain layer (Entities).
+
+When handling an incoming request, the Controller receives data as a RequestDTO, service layer can process by taking data from DTO and JWT
+.The Mapper converts this into an Entity to interact with Reposistory Layer.
+
+When preparing an outgoing response, the Service returns an Entity. The Mapper transforms it into a ResponseDTO, which is sent back to the client.
+
+This approach ensures:
+
+- A clean separation between internal models and external API contracts
+
+- Sensitive fields (e.g., password hashes) remain hidden from clients
+
+- Reduced boilerplate through automatic DTO ↔ Entity mapping
+
+- Consistent and maintainable code structure
+
+In short:
+
+RequestDTO → Mapper → Entity → Service → Repository → Entity → Mapper → ResponseDTO → Controller → Client
 
