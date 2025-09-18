@@ -2,6 +2,7 @@ package store.ACS.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import store.ACS.dto.request.AuthenticationRequest;
 import store.ACS.dto.request.IntrospectRequest;
 import store.ACS.dto.request.LogoutRequest;
+import store.ACS.dto.request.RefreshTokenRequest;
 import store.ACS.dto.response.AuthenticationResponse;
 import store.ACS.dto.response.IntrospectResponse;
 import store.ACS.dto.response.ApiResponse;
@@ -50,7 +52,7 @@ public class AuthenticationController {
 		HttpStatus status = isValid ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
 
 		ApiResponse<IntrospectResponse> response = ApiResponse.<IntrospectResponse>builder().success(isValid)
-				.message(isValid ? "Token is valid" : "Token is invalid or expired").status(status.value())
+				.status(status.value())
 				.timestamp(LocalDateTime.now()).result(result).build();
 
 		return ResponseEntity.status(status).body(response);
@@ -61,5 +63,24 @@ public class AuthenticationController {
 			throws ParseException, JOSEException {
 		 iAuthenticationServi.logout(request);
 			return ApiResponse.<Void>builder().build();
+	}
+	
+	@PostMapping("/refresh-token")
+	public ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request)
+	        throws ParseException, JOSEException {
+	    AuthenticationResponse result = iAuthenticationServi.refreshToken(request);
+	    boolean isAuthenticated = result.isAuthenticated();
+	    HttpStatus status = isAuthenticated ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+	    String message = isAuthenticated ? "Token refreshed successfully" : "Invalid refresh token";
+
+	    ApiResponse<AuthenticationResponse> response = ApiResponse.<AuthenticationResponse>builder()
+	            .success(isAuthenticated)
+	            .message(message)
+	            .result(result)
+	            .status(status.value())
+	            .timestamp(LocalDateTime.now())
+	            .build();
+
+	    return ResponseEntity.status(status).body(response);
 	}
 }

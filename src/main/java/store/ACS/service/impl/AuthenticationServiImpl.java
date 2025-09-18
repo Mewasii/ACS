@@ -13,9 +13,11 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import store.ACS.dto.request.AuthenticationRequest;
 import store.ACS.dto.request.IntrospectRequest;
 import store.ACS.dto.request.LogoutRequest;
+import store.ACS.dto.request.RefreshTokenRequest;
 import store.ACS.dto.response.AuthenticationResponse;
 import store.ACS.dto.response.IntrospectResponse;
 import store.ACS.entity.InvalidatedToken;
@@ -37,7 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+@Slf4j
 @Service
 public class AuthenticationServiImpl implements IAuthenticationServi {
 	@Autowired
@@ -151,6 +153,24 @@ public class AuthenticationServiImpl implements IAuthenticationServi {
 	        // fallback cho lỗi parse hoặc lỗi JOSE khác
 	        throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
 	    }
+	}
+	
+	public AuthenticationResponse refreshToken(RefreshTokenRequest request)throws ParseException,JOSEException {
+		//Thực hiện invalidated token cũ
+		var signedJWT = verifytoken(request.getToken());
+		var jit = signedJWT.getJWTClaimsSet().getJWTID(); 
+		var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+		InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+				.id(jit)
+				.expiryTime(expiryTime)
+				.build();
+		 invalidTokenRepo.save(invalidatedToken);
+		 //Issue Token mới 
+		 var username =  signedJWT.getJWTClaimsSet().getSubject();
+		 log.info("Authenticating user: {}", username);
+		 var user = userRepo.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED) );
+		 var token = generateToken(user);
+		return AuthenticationResponse.builder().token(token).Authenticated(true).build();
 	}
 
 }
