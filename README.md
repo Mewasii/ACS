@@ -48,3 +48,6 @@ The project focuses on providing a clean, production-ready structure while meeti
 │   └───impl        # Service implementations
 └───validator       # Custom annotations & validators
 ```
+# User Design
+<img width="1044" height="671" alt="image" src="https://github.com/user-attachments/assets/8284a45e-b5d3-4e52-9878-79c9d7e0b350" />
+
