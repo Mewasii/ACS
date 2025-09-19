@@ -72,5 +72,6 @@ This approach ensures:
 
 In short:
 
-RequestDTO → Mapper → Entity → Service → Repository → Entity → Mapper → ResponseDTO → Controller → Client
+<img width="1275" height="665" alt="image" src="https://github.com/user-attachments/assets/f446e939-e016-4a86-851b-0ba194edba89" />
+
 
