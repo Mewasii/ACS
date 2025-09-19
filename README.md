@@ -72,6 +72,7 @@ This approach ensures:
 
 In short:
 
-<img width="1275" height="665" alt="image" src="https://github.com/user-attachments/assets/f446e939-e016-4a86-851b-0ba194edba89" />
+<img width="1278" height="675" alt="image" src="https://github.com/user-attachments/assets/b735c240-e405-4768-85f8-5a26298c46f8" />
+
 
 
