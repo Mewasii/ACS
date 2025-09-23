@@ -74,7 +74,7 @@ In short:
 
 <img width="1278" height="675" alt="image" src="https://github.com/user-attachments/assets/b735c240-e405-4768-85f8-5a26298c46f8" />
 
-3/ JWT and Authentication
+## 3/ JWT and Authentication
 This project provides a secure authentication system using Spring Security with JWT (JSON Web Token).
 It demonstrates how to implement token-based authentication, validate user credentials, and protect API endpoints.
 ### JWT (JSON Web Token)
