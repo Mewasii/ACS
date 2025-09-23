@@ -74,5 +74,52 @@ In short:
 
 <img width="1278" height="675" alt="image" src="https://github.com/user-attachments/assets/b735c240-e405-4768-85f8-5a26298c46f8" />
 
+3/ JWT and Authentication
+This project provides a secure authentication system using Spring Security with JWT (JSON Web Token).
+It demonstrates how to implement token-based authentication, validate user credentials, and protect API endpoints.
+### JWT (JSON Web Token)
+JWT is used as a stateless way to authenticate and authorize users 
+<img width="1100" height="640" alt="image" src="https://github.com/user-attachments/assets/4f158b6a-2736-479b-9ed7-117d862e1323" />
 
 
+Flow:
+
+- User logs in with username and password.
+
+- If valid, the server generates a JWT token and returns it to the client.
+
+- The client includes this token in the Authorization header for subsequent requests.
+
+- The server validates the token before allowing access to protected resources.
+
+Benefits:
+
+- Stateless (no server-side sessions required).
+
+- Lightweight and efficient for distributed systems.
+
+- Built-in support for expiration and claims.
+
+### Authentication
+
+Login Process:
+
+- The system verifies user credentials against stored data.
+
+- On success, it issues a JWT token that grants access to protected APIs.
+
+Spring Security Configuration (SecurityConfig.java):
+
+- Defines which endpoints require authentication.
+
+- Configures JWT filters to intercept and validate requests.
+
+- Supports role-based access control for fine-grained permissions.
+
+Authentication Service (AuthenticationServiImpl.java):
+
+- Handles user login and token generation.
+
+- Validates user credentials using the authentication manager.
+
+- Encapsulates JWT logic to keep security concerns centralized.
