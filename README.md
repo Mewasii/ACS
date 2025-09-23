@@ -1,4 +1,4 @@
-# Spring Boot Web Backend For Animal Convenient Store
+# Spring Boot Backend With Spring Sercurity And JWT Authentication
 A Spring Boot backend application with RESTful APIs, authentication, and modular architecture.
 Designed for scalability, maintainability, and ease of integration with frontend or mobile clients
 
